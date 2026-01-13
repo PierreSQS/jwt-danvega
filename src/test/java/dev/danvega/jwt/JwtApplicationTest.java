@@ -1,4 +1,4 @@
-package dev.danvega.jwt.controller.dev.danvega.jwt;
+package dev.danvega.jwt;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
