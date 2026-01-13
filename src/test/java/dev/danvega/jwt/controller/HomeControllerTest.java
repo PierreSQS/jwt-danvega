@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest({HomeController.class, AuthController.class})
@@ -26,7 +27,8 @@ class HomeControllerTest {
     @Test
     void rootUnauthenticatedThen401() throws Exception {
         mockMvc.perform(get("/"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
     }
 
     @Test
@@ -34,6 +36,7 @@ class HomeControllerTest {
         // get token from /token endpoint (test stub)
         String token = mockMvc.perform(post("/token")
                         .with(httpBasic("dvega", "password")))
+                .andDo(print())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -41,7 +44,8 @@ class HomeControllerTest {
         mockMvc.perform(get("/")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Hello, dvega"));
+                .andExpect(content().string("Hello, dvega"))
+                .andDo(print());
     }
 
     @Test
@@ -49,7 +53,8 @@ class HomeControllerTest {
     void rootWithMockUserStatusIsOk() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Hello, dvega")));
+                .andExpect(content().string(containsString("Hello, dvega")))
+                .andDo(print());
     }
 
 }
