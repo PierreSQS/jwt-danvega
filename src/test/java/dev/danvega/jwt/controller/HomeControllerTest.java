@@ -49,11 +49,11 @@ class HomeControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "dvega")
+    @WithMockUser(username = "MockUser")
     void rootWithMockUserStatusIsOk() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Hello, dvega")))
+                .andExpect(content().string(containsString("Hello, MockUser")))
                 .andDo(print());
     }
 

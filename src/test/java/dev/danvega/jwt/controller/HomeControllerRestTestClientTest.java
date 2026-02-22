@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.client.ExchangeResult;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.util.Base64;
@@ -23,10 +25,14 @@ class HomeControllerRestTestClientTest {
 
     @Test
     void rootUnauthenticatedThen401() {
-        RestTestClient.bindTo(mockMvc).build()
+        ExchangeResult exchangeResult = RestTestClient.bindTo(mockMvc).build()
                 .get().uri("/")
                 .exchange()
-                .expectStatus().isUnauthorized();
+                .expectStatus().isUnauthorized()
+                .returnResult();
+
+        HttpStatusCode status = exchangeResult.getStatus();
+        System.out.println("Status code: " + status);
     }
 
     @Test
@@ -40,21 +46,30 @@ class HomeControllerRestTestClientTest {
                 .expectStatus().isOk()
                 .expectBody(String.class).returnResult().getResponseBody();
 
-        client.get().uri("/")
+        String responseBody = client.get().uri("/")
                 .header("Authorization", "Bearer " + token)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("Hello, dvega");
+                .expectBody(String.class).isEqualTo("Hello, dvega")
+                .returnResult().getResponseBody();
+
+        assertThat(responseBody).isEqualTo("Hello, dvega");
+        System.out.println("Response body: " + responseBody);
     }
 
     @Test
-    @WithMockUser(username = "dvega")
+    @WithMockUser(username = "MockUser")
     void rootWithMockUserStatusIsOk() {
         RestTestClient.bindTo(mockMvc).build()
                 .get().uri("/")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
-                .value(body -> assertThat(body).contains("Hello, dvega"));
+                .value(body -> assertThat(body).contains("Hello, MockUser"))
+                .consumeWith(exchangeResult -> {
+                    String responseBody = exchangeResult.getResponseBody();
+                    System.out.println("Response body: " + responseBody);
+                    System.out.println("Status code: " + exchangeResult.getStatus());
+                });
     }
 }
