@@ -67,8 +67,7 @@ class HomeControllerRestTestClientTest {
                 .expectBody(String.class)
                 .value(body -> assertThat(body).contains("Hello, MockUser"))
                 .consumeWith(exchangeResult -> {
-                    String responseBody = exchangeResult.getResponseBody();
-                    System.out.println("Response body: " + responseBody);
+                    System.out.println("Response body: " + exchangeResult.getResponseBody());
                     System.out.println("Status code: " + exchangeResult.getStatus());
                 });
     }
