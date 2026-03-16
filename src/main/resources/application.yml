@@ -1,3 +1,11 @@
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem
+
+spring:
+  output.ansi.enabled: ALWAYS
+
+# enable security logging
+logging:
+  level:
+    org.springframework.security: TRACE
